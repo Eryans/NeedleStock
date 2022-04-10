@@ -16,6 +16,7 @@ mongoose.connect(
     );
 
 app.use('/api/user',require('./routes/userRoutes'));
+app.use('/api/jewel',require('./routes/jewelryRoute'));
 
 app.use(errorHandler)
 

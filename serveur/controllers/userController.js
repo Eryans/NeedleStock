@@ -1,5 +1,4 @@
 const User = require("../models/Users");
-const { use } = require("../routes/userRoutes");
 
 // @desc Get Users
 // @route GET /api/user
