@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/Eryans/NeedleStock#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.0",
+    "jsonwebtoken": "^8.5.1",
     "nodemon": "^2.0.15"
   }
 }
