@@ -12,6 +12,20 @@ const getUsers = async (req, res) => {
     console.log(err);
   }
 };
+const getConnectedUser = async(req,res) => {
+  try{
+    const {_id,mail,name} = req.body;
+    const user = await User.find({user: req.user.id})
+  } catch(err){
+    
+  }
+}
+// Generate JWT
+const  generateToken = (id) => {
+  return jwt.sign({id},process.env.JWT_SECRET,{
+    expiresIn: '30d'
+  })
+}
 // @route POST /api/user
 const setUser = async (req, res) => {
   try {
@@ -22,7 +36,7 @@ const setUser = async (req, res) => {
       throw new Error("Veuillez remplir toutes les informations");
     }
     // Check if user already exist
-    const userExists = await User.findOne({email});
+    const userExists = await User.findOne({ email });
     if (userExists) {
       res.status(400);
       throw new Error("Utilisateur déjà enregistré");
@@ -42,6 +56,7 @@ const setUser = async (req, res) => {
         _id: user.id,
         name: user.name,
         email: user.email,
+        token: generateToken(user._id)
       });
     } else {
       res.status(400);
@@ -52,8 +67,20 @@ const setUser = async (req, res) => {
   }
 };
 const loginUser = async (req, res) => {
+  const { email, password } = req.body;
   try {
-    res.status(200).json({ message: "Login user" });
+    const user = await User.findOne({ email });
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.json({
+        _id: user.id,
+        name: user.name,
+        email: user.email,
+        token: generateToken(user._id),
+        message:"Utilisateur connecté"
+      });
+    } else {
+      res.status(400).json({message:"Informations invalides"})
+    }
   } catch (err) {
     console.log(err);
   }

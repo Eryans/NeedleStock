@@ -18,7 +18,7 @@ const setJewelry = async (req, res) => {
       material: req.body.material,
       height: req.body.height,
       width: req.body.width,
-      quantity: req.body.quantity,
+      quantity: req.body.quantity
     })
     res.status(200).json(jewelry)
   } catch (err) {
