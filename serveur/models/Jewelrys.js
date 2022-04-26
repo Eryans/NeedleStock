@@ -9,6 +9,10 @@ const jewelrySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    body_zone: {
+        type: String,
+        required: true
+    },
     height: {
         type: Number,
         required: true
@@ -20,6 +24,10 @@ const jewelrySchema = new mongoose.Schema({
     quantity: {
         type: Number,
         required: true
+    },
+    unit_price: {
+        type: Number,
+        required: false
     }
 })
 

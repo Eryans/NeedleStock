@@ -16,8 +16,10 @@ const setJewelry = async (req, res) => {
     const jewelry = await Jewelry.create({
       name: req.body.name,
       material: req.body.material,
+      body_zone: req.body.body_zone,
       height: req.body.height,
       width: req.body.width,
+      unit_price: req.body.unit_price,
       quantity: req.body.quantity
     })
     res.status(200).json(jewelry)
