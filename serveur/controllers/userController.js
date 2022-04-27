@@ -26,41 +26,39 @@ const  generateToken = (id) => {
     expiresIn: '30d'
   })
 }
-// @route POST /api/user
+// @route POST /api/user/register
 const setUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const {username, email, password } = req.body;
+    console.log(req.body)
 
-    if (!name || !email || !password) {
-      res.status(400);
-      throw new Error("Veuillez remplir toutes les informations");
+    if ( !username || !email || !password) {
+      return res.json({message:"Veuillez remplir toutes les informations"});
     }
     // Check if user already exist
     const userExists = await User.findOne({ email });
     if (userExists) {
-      res.status(400);
-      throw new Error("Utilisateur déjà enregistré");
+     return res.json({message:"Utilisateur déjà enregistré"});
     }
     // hash passward
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     // Register User
     const user = await User.create({
-      name: name,
+      name: username,
       email: email,
       password: hashedPassword,
     });
 
     if (user) {
-      res.status(201).json({
+      return res.status(201).json({
         _id: user.id,
-        name: user.name,
+        username: user.name,
         email: user.email,
         token: generateToken(user._id)
       });
     } else {
-      res.status(400);
-      throw new Error("INVALID USER DATA");
+      return res.json({message:"INVALID USER DATA"});
     }
   } catch (err) {
     console.log(err);
@@ -71,7 +69,7 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({
+      return res.json({
         _id: user.id,
         name: user.name,
         email: user.email,
@@ -79,7 +77,7 @@ const loginUser = async (req, res) => {
         message:"Utilisateur connecté"
       });
     } else {
-      res.status(400).json({message:"Informations invalides"})
+      return res.json({message:"Informations invalides"})
     }
   } catch (err) {
     console.log(err);
@@ -89,8 +87,7 @@ const loginUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) {
-    res.status(400);
-    throw new Error("User not found");
+    return res.json("User not found");
   }
   try {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
