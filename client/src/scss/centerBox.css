@@ -1,6 +1,7 @@
-.ctrBox{
-    width:100vw;
-    height: 100vw;
+.ctnBox{
+    min-height:100vh;
+}
+.ctrBox,.ctnBox{
     display: flex;
     flex-direction: column;
     justify-content: center;

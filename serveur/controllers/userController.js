@@ -4,9 +4,9 @@ const bcrypt = require("bcryptjs");
 
 // @desc Get Users
 // @route GET /api/user
-const getUsers = async (req, res) => {
+const getUsers = (req, res) => {
   try {
-    const users = await User.find();
+    const users = User.find();
     res.status(200).json(users);
   } catch (err) {
     console.log(err);
@@ -15,7 +15,7 @@ const getUsers = async (req, res) => {
 const getConnectedUser = async(req,res) => {
   try{
     const {_id,mail,name} = req.body;
-    const user = await User.find({user: req.user.id})
+    const user = User.find({user: req.user.id})
   } catch(err){
     
   }
@@ -30,19 +30,21 @@ const  generateToken = (id) => {
 const setUser = async (req, res) => {
   try {
     const {username, email, password } = req.body;
-    console.log(req.body)
 
     if ( !username || !email || !password) {
       return res.json({message:"Veuillez remplir toutes les informations"});
     }
     // Check if user already exist
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: email });
     if (userExists) {
      return res.json({message:"Utilisateur déjà enregistré"});
     }
+    console.log(password)
     // hash passward
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    
+    console.log(hashedPassword)
     // Register User
     const user = await User.create({
       name: username,
@@ -55,6 +57,7 @@ const setUser = async (req, res) => {
         _id: user.id,
         username: user.name,
         email: user.email,
+        message:"Votre compte a bien été enregistré",
         token: generateToken(user._id)
       });
     } else {
@@ -64,11 +67,13 @@ const setUser = async (req, res) => {
     console.log(err);
   }
 };
+
+// @route /api/user/login
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
-    if (user && (await bcrypt.compare(password, user.password))) {
+    const user = await User.findOne({ email: email });
+    if (user && (bcrypt.compare(password, user.password))) {
       return res.json({
         _id: user.id,
         name: user.name,
@@ -84,13 +89,13 @@ const loginUser = async (req, res) => {
   }
 };
 // @route PUT /api/user/:id
-const updateUser = async (req, res) => {
-  const user = await User.findById(req.params.id);
+const updateUser = (req, res) => {
+  const user = User.findById(req.params.id);
   if (!user) {
     return res.json("User not found");
   }
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedUser = User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
     res.status(200).json(updatedUser);
@@ -99,14 +104,14 @@ const updateUser = async (req, res) => {
   }
 };
 // @route DELETE /api/user/:id
-const deleteUser = async (req, res) => {
-  const user = await User.findById(req.params.id);
+const deleteUser = (req, res) => {
+  const user = User.findById(req.params.id);
   if (!user) {
     res.status(400);
     throw new Error("User not found");
   }
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    const deletedUser = User.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: `${user.name} was deleted` });
   } catch (err) {
     console.log(err);

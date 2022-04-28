@@ -1,7 +1,7 @@
 import Textfield from "@mui/material/TextField";
 import BoxCenter from "../../customComponents/BoxCenter";
 import { useForm } from "react-hook-form";
-import { Button } from "@mui/material";
+import { Button, Link } from "@mui/material";
 import { Box, flexbox } from "@mui/system";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,6 +12,7 @@ export default function RegisterPage() {
 
   const validationSchema = yup
     .object({
+      username: yup.string().required(),
       email: yup.string().email().required(),
       password: yup.string().required(),
     })
@@ -19,10 +20,10 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
+      username: "",
       email: "",
       password: "",
     },
@@ -30,12 +31,10 @@ export default function RegisterPage() {
   });
 
   const onSubmit = (values) => {
-    console.log("hello");
     return new Promise((resolve, reject) => {
       try {
         registerUser(values).then((res) => {
-          console.log(res);
-          setMessage(res);
+          setMessage(res.message);
           resolve();
         });
       } catch (err) {
@@ -48,7 +47,7 @@ export default function RegisterPage() {
     <BoxCenter>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        style={{ display: "flex", flexDirection: "column", gap: "2em" }}
+        style={{ display: "flex", flexDirection: "column", gap: "2em"}}
       >
         <Textfield
           name="username"
@@ -80,7 +79,12 @@ export default function RegisterPage() {
         ></Textfield>
         <Button type="submit">Inscription</Button>
 
-        {/* {message && <Box mt={2}>{message}</Box>} */}
+        {message && 
+        <>
+        <Box mt={2}>{message}</Box>
+        <Link href="/login" component={Button} variant="contained">Retourner à l'écran de connexion</Link>
+        </>
+        }
       </form>
     </BoxCenter>
   );

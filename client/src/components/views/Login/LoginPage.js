@@ -1,31 +1,47 @@
 import Textfield from "@mui/material/TextField";
 import BoxCenter from "../../customComponents/BoxCenter";
 import { useForm } from "react-hook-form";
-import { Button } from "@mui/material";
+import { Button, Link } from "@mui/material";
+import { loginUser } from "../../axios/user_action";
 import { flexbox } from "@mui/system";
 import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 
 export default function LoginPage() {
-
-    const validationSchema = yup.object({
-        email: yup.string().email().required(),
-        password: yup.string().required()
-    }).required()
-const {
+  const validationSchema = yup
+  .object({
+    email: yup.string().email().required(),
+    password: yup.string().required(),
+  })
+  .required();
+  const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
-      resolver: validationSchema,
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-
+  useEffect(() => {
+    console.log(localStorage.getItem('token'))
+  })
   const onSubmit = (values) => {
-    console.log(values);
+    return new Promise((resolve) => {
+      try {
+        loginUser(values).then((res) => {
+          console.log(res);
+          localStorage.setItem('token',res.token)
+          console.log(localStorage.getItem('token'))
+          resolve();
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    });
   };
 
   return (
@@ -52,7 +68,12 @@ const {
           placeholder="password"
           required
         ></Textfield>
-        <Button type="submit">Connexion</Button>
+        <Button type="submit" variant="contained">
+          Connexion
+        </Button>
+        <Link href="/register" component={Button} variant="contained">
+          Créer un compte
+        </Link>
       </form>
     </BoxCenter>
   );
