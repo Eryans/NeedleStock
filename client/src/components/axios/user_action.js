@@ -1,5 +1,5 @@
 import axios from "axios";
-import { $USER_SERVER, HEADERS } from "../config";
+import { $USER_SERVER, Auth } from "../config";
 
 export async function registerUser(dataToSubmit) {
   return await axios

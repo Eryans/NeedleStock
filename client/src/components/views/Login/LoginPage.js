@@ -34,8 +34,9 @@ export default function LoginPage() {
       try {
         loginUser(values).then((res) => {
           console.log(res);
+          localStorage["user"] = res.name
           localStorage.setItem('token',res.token)
-          console.log(localStorage.getItem('token'))
+          console.log(localStorage["user"])
           resolve();
         });
       } catch (err) {
