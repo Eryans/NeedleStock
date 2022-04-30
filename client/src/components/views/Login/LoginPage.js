@@ -35,6 +35,7 @@ export default function LoginPage() {
       try {
         loginUser(values).then((res) => {
           const user = {
+            id: res._id,
             name: res.name,
             email: res.email,
             token: res.token,
