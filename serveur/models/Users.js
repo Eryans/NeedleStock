@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -16,7 +15,14 @@ const UserSchema = new mongoose.Schema({
     },
     token:{
         type:String,
-    }
+    },
+    groups: [
+        {
+          type: mongoose.Types.ObjectId,
+          required: false,
+          ref: "group",
+        },
+      ],
 },{
     timestamps:true
 })

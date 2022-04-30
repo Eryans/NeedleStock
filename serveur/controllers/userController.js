@@ -12,39 +12,35 @@ const getUsers = (req, res) => {
     console.log(err);
   }
 };
-const getConnectedUser = async(req,res) => {
-  try{
-    const {_id,mail,name} = req.body;
-    const user = User.find({user: req.user.id})
-  } catch(err){
-    
-  }
-}
+const getConnectedUser = async (req, res) => {
+  try {
+    const { _id, mail, name } = req.body;
+    const user = User.find({ user: req.user.id });
+  } catch (err) {}
+};
 // Generate JWT
-const  generateToken = (id) => {
-  return jwt.sign({id},process.env.JWT_SECRET,{
-    expiresIn: '30d'
-  })
-}
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
+  });
+};
 // @route POST /api/user/register
 const setUser = async (req, res) => {
   try {
-    const {username, email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    if ( !username || !email || !password) {
-      return res.json({message:"Veuillez remplir toutes les informations"});
+    if (!username || !email || !password) {
+      return res.json({ message: "Veuillez remplir toutes les informations" });
     }
     // Check if user already exist
     const userExists = await User.findOne({ email: email });
     if (userExists) {
-     return res.json({message:"Utilisateur déjà enregistré"});
+      return res.json({ message: "Utilisateur déjà enregistré" });
     }
-    console.log(password)
     // hash passward
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
-    console.log(hashedPassword)
+
     // Register User
     const user = await User.create({
       name: username,
@@ -57,11 +53,11 @@ const setUser = async (req, res) => {
         _id: user.id,
         username: user.name,
         email: user.email,
-        message:"Votre compte a bien été enregistré",
-        token: generateToken(user._id)
+        message: "Votre compte a bien été enregistré",
+        token: generateToken(user._id),
       });
     } else {
-      return res.json({message:"INVALID USER DATA"});
+      return res.json({ message: "INVALID USER DATA" });
     }
   } catch (err) {
     console.log(err);
@@ -73,16 +69,18 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email: email });
-    if (user && (bcrypt.compare(password, user.password))) {
+    if (user && bcrypt.compare(password, user.password)) {
       return res.json({
         _id: user.id,
         name: user.name,
         email: user.email,
         token: generateToken(user._id),
-        message:"Utilisateur connecté"
+        message: "Utilisateur connecté",
+        groups: user.groups,
+        success: true,
       });
     } else {
-      return res.json({message:"Informations invalides"})
+      return res.json({ message: "Informations invalides", success:false });
     }
   } catch (err) {
     console.log(err);

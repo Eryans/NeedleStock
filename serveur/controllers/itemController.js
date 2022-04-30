@@ -1,70 +1,62 @@
-const Item = require('../models/Items')
+const Item = require("../models/Items");
 
 // @desc Get Items
-// @route GET /api/jewelry
+// @route GET /api/item
 const getItems = async (req, res) => {
   try {
-    const jewelrys = await Item.find()
-    res.status(200).json(jewelrys)
+    const items = await Item.find();
+    res.status(200).json(items);
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-}
-// @route POST /api/jewelry
+};
+// @route POST /api/item
 const setItem = async (req, res) => {
   try {
-    const jewelry = await Item.create({
+    const item = await Item.create({
       name: req.body.name,
-      material: req.body.material,
-      body_zone: req.body.body_zone,
-      height: req.body.height,
-      width: req.body.width,
-      unit_price: req.body.unit_price,
-      quantity: req.body.quantity
-    })
-    res.status(200).json(jewelry)
+      customFields: req.body.customFields,
+      quantity: req.body.quantity,
+    });
+    res.status(200).json(item);
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-}
-// @route PUT /api/jewelry/:id
+};
+// @route PUT /api/item/:id
 const updateItem = async (req, res) => {
-  const jewelry = await Item.findById(req.params.id)
-  if (!jewelry) {
-    res.status(400)
-    throw new Error('Item not found')
+  const item = await Item.findById(req.params.id);
+  if (!item) {
+    res.status(400);
+    throw new Error("Item not found");
   }
   try {
-    const updatedItem = await Item.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-      },
-    )
-    res.status(200).json(updatedItem)
+    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    res.status(200).json(updatedItem);
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-}
-// @route DELETE /api/jewelry/:id
+};
+// @route DELETE /api/item/:id
 const deleteItem = async (req, res) => {
-  const jewelry = await Item.findById(req.params.id)
-  if (!jewelry) {
-    res.status(400)
-    throw new Error('Item not found')
+  const item = await Item.findById(req.params.id);
+  if (!item) {
+    res.status(400);
+    throw new Error("Item not found");
   }
   try {
-    const deletedItem = await Item.findByIdAndDelete(req.params.id)
-    res.status(200).json({ message: `${jewelry.name} was deleted` })
+    const deletedItem = await Item.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: `${item.name} was deleted` });
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
-}
+};
 
 module.exports = {
   getItems,
   setItem,
   updateItem,
   deleteItem,
-}
+};

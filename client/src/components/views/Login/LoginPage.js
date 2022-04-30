@@ -10,11 +10,11 @@ import { useEffect } from "react";
 
 export default function LoginPage() {
   const validationSchema = yup
-  .object({
-    email: yup.string().email().required(),
-    password: yup.string().required(),
-  })
-  .required();
+    .object({
+      email: yup.string().email().required(),
+      password: yup.string().required(),
+    })
+    .required();
   const {
     register,
     handleSubmit,
@@ -27,16 +27,21 @@ export default function LoginPage() {
     },
   });
   useEffect(() => {
-    console.log(localStorage.getItem('token'))
-  })
+    const user = JSON.parse(localStorage.getItem("user")) 
+    console.log(user);
+  });
   const onSubmit = (values) => {
     return new Promise((resolve) => {
       try {
         loginUser(values).then((res) => {
-          console.log(res);
-          localStorage["user"] = res.name
-          localStorage.setItem('token',res.token)
-          console.log(localStorage["user"])
+          const user = {
+            name: res.name,
+            email: res.email,
+            token: res.token,
+            groups: res.groups
+          }
+          localStorage["user"] = JSON.stringify(user);
+          console.log(JSON.parse(localStorage["user"]));
           resolve();
         });
       } catch (err) {

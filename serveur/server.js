@@ -11,14 +11,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-mongoose.connect(
-  process.env.MONGODB_LINK
-);
+mongoose.connect(process.env.MONGODB_LINK);
 
 app.use("/api/user", require("./routes/userRoutes"));
-app.use("/api/jewels", require("./routes/jewelryRoute"));
-app.use("/api/tools", require("./routes/toolRoute"))
-app.use("/api/item", require("./routes/itemsRoute"))
+app.use("/api/group", require("./routes/groupsRoutes"));
+app.use("/api/item", require("./routes/itemsRoute"));
 
 app.use(errorHandler);
 
