@@ -1,20 +1,19 @@
-import { useState, useEffect } from "react";
-import { getItems, registerItem } from "../axios/items_action";
-import { getUserGroup, setGroup } from "../axios/group_action";
-import BoxCenter from "../customComponents/BoxCenter";
-import { Button, TextField } from "@mui/material";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import { Box } from "@mui/system";
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import BoxCenter from '../customComponents/BoxCenter'
+import Groups from '../Layouts/Groups'
+import { getSingleGroup } from '../axios/group_action'
+import { TextField, Button, Input } from '@mui/material'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function HomePage() {
-  const validationSchema = yup.object({
+  const validationSchema = yup
+    .object({
       name: yup.string().required(),
-      password: yup.string().required(),
-      passwordCheck: yup.string().oneOf([yup.ref("password"), null], "Passwords must match")
+      quantity:yup.number().required(),
     })
-    .required();
+    .required()
   const {
     register,
     handleSubmit,
@@ -22,122 +21,74 @@ export default function HomePage() {
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      name: "",
-      password: "",
-      passwordCheck: ""
+      name: '',
+      password: '',
+      passwordCheck: '',
     },
-  });
+  })
 
-  const [items, setItems] = useState([]);
-  const [groups, setGroups] = useState([]);
-
-  useEffect(() => {
-    const currentUser = JSON.parse(localStorage["user"]);
-    if (!currentUser) {
-      console.log("vous n'êtes pas connecté");
-    } else {
-      console.log(currentUser);
-    }
-    return new Promise((resolve) => {
-      getUserGroup({ id: currentUser.id }).then((res) => {
-        console.log(res);
-        setGroups(res.groups);
-        resolve();
-      });
-    });
-  }, []);
-
-  const onSubmit = (values) => {
-    const currentUser = JSON.parse(localStorage["user"]);
-
-    return new Promise((resolve) => {
-      try {
-        setGroup({values, id:currentUser.id}).then((res) => {
-          console.log(res)
-        })
-        resolve();
-      } catch (err) {
-        console.log(err);
-      }
-    });
-  };
-
+  const [currentGroup, setCurrentGroup] = useState(null)
+  const chooseGroup = async (e) => {
+    try {
+      let group = e.target.getAttribute('data-value')
+      getSingleGroup({ id: group }).then((res) => {
+        setCurrentGroup(res)
+      })
+      setCurrentGroup()
+    } catch (err) {}
+  }
   return (
     <>
       <BoxCenter>
         <h1>Home Page</h1>
-        {items.length > 0 && (
-          <ul>
-            {items.map((x, i) => {
-              return <li key={`${x.name}/${i}`}>{x.name}</li>;
-            })}
-          </ul>
-        )}
-        {groups.length <= 0 ? (
+        {!currentGroup ? (
+          <Groups groupFunc={chooseGroup} />
+        ) : (
           <>
-            <p>
-              Il semblerait que vous n'ayez pas encore de groupe, créer en un si
-              dessous &#128515;
-            </p>
-            <br></br>
+            <h1>{currentGroup.name}</h1>
+            <ul>
+              {currentGroup.items.length > 0 ? (
+                currentGroup.items.map((item) => {
+                  ;<li>{item.name}</li>
+                })
+              ) : (
+                <div>Pas encore d'object enregistrés</div>
+              )}
+            </ul>
             <form
-              onSubmit={handleSubmit(onSubmit)}
               style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "2em",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2em',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "2em",
-                  width: "50%",
-                }}
-              >
-                <TextField
-                  name="name"
-                  {...register("name")}
-                  type="text"
-                  variant="standard"
-                  placeholder="Nom du groupe"
-                  error={!!errors?.name}
-                  helperText={errors?.name ? errors.name.message : null}
-                  required
-                ></TextField>
-                <TextField
-                  name="password"
-                  {...register("password")}
-                  type="password"
-                  variant="standard"
-                  placeholder="mot de passe"
-                  error={!!errors?.password}
-                  helperText={errors?.password ? errors.password.message : null}
-                  required
-                ></TextField>
-                <TextField
-                  name="passwordCheck"
-                  {...register("passwordCheck")}
-                  type="password"
-                  variant="standard"
-                  placeholder="comfirmer votre mot de passe"
-                  error={!!errors?.passwordCheck}
-                  helperText={
-                    errors?.passwordCheck ? errors.passwordCheck.message : null
-                  }
-                  required
-                ></TextField>
-                <Button type="submit" variant="contained">Créer votre groupe</Button>
-              </Box>
+              <TextField
+                name="name"
+                {...register('name')}
+                type="text"
+                variant="standard"
+                placeholder="Nom"
+                error={!!errors?.name}
+                helperText={errors?.name ? errors.name.message : null}
+                required
+              ></TextField>
+              <Input
+                name="quantity"
+                {...register('quantity')}
+                type="number"
+                variant="standard"
+                placeholder="Quantité"
+                error={!!errors?.quantity}
+                helperText={errors?.quantity ? errors.quantity.message : null}
+                required
+              ></Input>
             </form>
+            <Button>Ajouter un objet</Button>
           </>
-        ) : (
-          <h2>Do something</h2>
         )}
       </BoxCenter>
     </>
-  );
+  )
 }

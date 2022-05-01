@@ -6,9 +6,12 @@ import { Box, flexbox } from "@mui/system";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerUser } from "../../axios/user_action";
-import { useState } from "react";
+import { useState,useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+
 export default function RegisterPage() {
   const [message, setMessage] = useState();
+  const { setUser } = useContext(AuthContext)
 
   const validationSchema = yup
     .object({
@@ -35,10 +38,13 @@ export default function RegisterPage() {
       try {
         registerUser(values).then((res) => {
           setMessage(res.message);
+          setUser(values)
+          localStorage['user'] = JSON.stringify(values)
+          navigator('/')
           resolve();
         });
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     });
   };
