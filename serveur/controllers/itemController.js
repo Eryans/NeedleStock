@@ -10,7 +10,15 @@ const getItems = async (req, res) => {
     console.log(err);
   }
 };
-// @route POST /api/item
+const getSingleItem = async (req, res) => {
+  try {
+    const item = await Item.findOne({_id: req.body._id});
+    res.status(200).json(item);
+  } catch (err) {
+    console.log(err);
+  }
+};
+// @route POST /api/item/setItem
 const setItem = async (req, res) => {
   try {
     const item = await Item.create({
@@ -59,4 +67,5 @@ module.exports = {
   setItem,
   updateItem,
   deleteItem,
+  getSingleItem
 };

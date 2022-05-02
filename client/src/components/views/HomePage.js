@@ -1,16 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import BoxCenter from '../customComponents/BoxCenter'
 import Groups from '../Layouts/Groups'
-import { getSingleGroup } from '../axios/group_action'
+import {
+  getSingleGroup,
+  updateGroup,
+  updateGroupitems,
+} from '../axios/group_action'
 import { TextField, Button, Input, Box } from '@mui/material'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { getItems, getSingleItem, registerItem } from '../axios/items_action'
 
 export default function HomePage() {
   const [currentGroup, setCurrentGroup] = useState(null)
   const [customFieldsnbr, setCustomFieldsNbr] = useState([])
-  const [customFields, setCustomFields] = useState([])
+  const [items, setItems] = useState([])
 
   const validationSchema = yup
     .object({
@@ -39,11 +44,10 @@ export default function HomePage() {
 
   const chooseGroup = async (e) => {
     try {
-      let group = e.target.getAttribute('data-value')
-      getSingleGroup({ id: group }).then((res) => {
+      let groupId = e.target.getAttribute('data-value')
+      getSingleGroup({ id: groupId }).then((res) => {
         setCurrentGroup(res)
       })
-      setCurrentGroup()
     } catch (err) {}
   }
 
@@ -55,22 +59,50 @@ export default function HomePage() {
     })
   }
 
-  const onSubmit = (values) => {
-    let customF = document.querySelectorAll('[data-key]')
-    let customFieldsArray = Array.from(customF).map((field) => {
-      let customObject = {
-        fieldName: field.childNodes[0].firstChild.firstChild.value,
-        value: field.childNodes[1].firstChild.firstChild.value,
-      }
-      return customObject
+  const onSubmit = async (values) => {
+    return new Promise((resolve) => {
+      try {
+        let customF = document.querySelectorAll('[data-key]')
+        let customFieldsArray = Array.from(customF).map((field) => {
+          let customObject = {
+            name: field.childNodes[0].firstChild.firstChild.value,
+            content: field.childNodes[1].firstChild.firstChild.value,
+            // MUI is a pain to get data
+          }
+          return customObject
+        })
+        const newBody = {
+          name: values.name,
+          quantity: values.quantity,
+          customFields: customFieldsArray,
+        }
+        registerItem(newBody).then((res) => {
+          updateGroupitems({ item: res, groupId: currentGroup._id }).then(
+            (response) => {
+              setCurrentGroup(response)
+            },
+          )
+          resolve()
+        })
+      } catch (err) {}
     })
-    const newBody = {
-      name:values.name,
-      quantity:values.quantity,
-      customFields:customFieldsArray
-    }
-    console.log(newBody)
   }
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        getSingleGroup({ id: currentGroup._id }).then((res) => {
+          setItems([]) // Empty State before filling it again to avoid double
+          res.items.map((item, index) => {
+            getSingleItem({ _id: item }).then((response) => {
+              setItems((items) => [...items, response])
+            })
+          })
+        })
+      } catch (err) {}
+    }
+    fetchItems()
+  }, [currentGroup])
   return (
     <>
       <BoxCenter>
@@ -81,10 +113,25 @@ export default function HomePage() {
           <>
             <h1>{currentGroup.name}</h1>
             <ul>
-              {currentGroup.items.length > 0 ? (
-                currentGroup.items.map((item) => {
-                  ;<li>{item.name}</li>
-                })
+              {items.length > 0 ? (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nom</th>
+                      <th>Quantité</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item) => {
+                      return (
+                        <tr key={`${item._id}`}>
+                          <td>{item.name}</td>
+                          <td>{item.quantity}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               ) : (
                 <div>Pas encore d'object enregistrés</div>
               )}
