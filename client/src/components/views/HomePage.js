@@ -3,15 +3,21 @@ import { useForm } from 'react-hook-form'
 import BoxCenter from '../customComponents/BoxCenter'
 import Groups from '../Layouts/Groups'
 import { getSingleGroup } from '../axios/group_action'
-import { TextField, Button, Input } from '@mui/material'
+import { TextField, Button, Input, Box } from '@mui/material'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 export default function HomePage() {
+  const [currentGroup, setCurrentGroup] = useState(null)
+  const [customFieldsnbr, setCustomFieldsNbr] = useState([])
+  const [customFields, setCustomFields] = useState([])
+
   const validationSchema = yup
     .object({
       name: yup.string().required(),
-      quantity:yup.number().required(),
+      quantity: yup.number().required(),
+      content: yup.string(),
+      value: yup.string(),
     })
     .required()
   const {
@@ -22,12 +28,15 @@ export default function HomePage() {
     resolver: yupResolver(validationSchema),
     defaultValues: {
       name: '',
-      password: '',
-      passwordCheck: '',
+      quantity: 0,
     },
   })
 
-  const [currentGroup, setCurrentGroup] = useState(null)
+  const addRow = () => {
+    let newField = {}
+    setCustomFieldsNbr([...customFieldsnbr, newField])
+  }
+
   const chooseGroup = async (e) => {
     try {
       let group = e.target.getAttribute('data-value')
@@ -36,6 +45,31 @@ export default function HomePage() {
       })
       setCurrentGroup()
     } catch (err) {}
+  }
+
+  const delRow = async (e) => {
+    setCustomFieldsNbr((prev) => {
+      const next = [...prev]
+      next.pop()
+      return next
+    })
+  }
+
+  const onSubmit = (values) => {
+    let customF = document.querySelectorAll('[data-key]')
+    let customFieldsArray = Array.from(customF).map((field) => {
+      let customObject = {
+        fieldName: field.childNodes[0].firstChild.firstChild.value,
+        value: field.childNodes[1].firstChild.firstChild.value,
+      }
+      return customObject
+    })
+    const newBody = {
+      name:values.name,
+      quantity:values.quantity,
+      customFields:customFieldsArray
+    }
+    console.log(newBody)
   }
   return (
     <>
@@ -63,6 +97,7 @@ export default function HomePage() {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
+              onSubmit={handleSubmit(onSubmit)}
             >
               <TextField
                 name="name"
@@ -71,7 +106,7 @@ export default function HomePage() {
                 variant="standard"
                 placeholder="Nom"
                 error={!!errors?.name}
-                helperText={errors?.name ? errors.name.message : null}
+                helpertext={errors?.name ? errors.name.message : null}
                 required
               ></TextField>
               <Input
@@ -81,11 +116,45 @@ export default function HomePage() {
                 variant="standard"
                 placeholder="Quantité"
                 error={!!errors?.quantity}
-                helperText={errors?.quantity ? errors.quantity.message : null}
+                helpertext={errors?.quantity ? errors.quantity.message : null}
                 required
               ></Input>
+              {customFieldsnbr.length > 0 && (
+                <Button onClick={delRow}>Retirer un objet</Button>
+              )}
+              {customFieldsnbr.map((field, i) => {
+                return (
+                  <Box key={`key${i}`} data-key={`fieldBox${i}`}>
+                    <TextField
+                      name={`content${i}`}
+                      id={`content${i}`}
+                      type="text"
+                      variant="standard"
+                      placeholder="Contenu"
+                      error={!!errors?.content}
+                      helpertext={
+                        errors?.content ? errors.content.message : null
+                      }
+                      required
+                      key={`keyContent${i}`}
+                    ></TextField>
+                    <TextField
+                      name={`value${i}`}
+                      id={`value${i}`}
+                      type="text"
+                      variant="standard"
+                      placeholder="Valeur"
+                      error={!!errors?.value}
+                      helpertext={errors?.value ? errors.value.message : null}
+                      required
+                      key={`keyValue${i}`}
+                    ></TextField>
+                  </Box>
+                )
+              })}
+              <Button onClick={addRow}>Ajouter une valeur</Button>
+              <Button type="submit">Créer un objet</Button>
             </form>
-            <Button>Ajouter un objet</Button>
           </>
         )}
       </BoxCenter>
