@@ -26,8 +26,13 @@ export async function updateGroup(dataToSubmit) {
     .put(`${$GROUP_SERVER}/getSingleGroup`, dataToSubmit, Auth)
     .then((response) => response.data)
 }
-export async function updateGroupitems(dataToSubmit) {
+export async function addGroupitems(dataToSubmit) {
   return await axios
-    .put(`${$GROUP_SERVER}/updateGroupItems`, dataToSubmit, Auth)
+    .put(`${$GROUP_SERVER}/addGroupItems`, dataToSubmit, Auth)
+    .then((response) => response.data)
+}
+export async function deleteGroupItem(dataToSubmit) {
+  return await axios
+    .put(`${$GROUP_SERVER}/deleteGroupItem`, dataToSubmit, Auth)
     .then((response) => response.data)
 }

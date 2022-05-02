@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import BoxCenter from "../customComponents/BoxCenter";
-import Groups from "../Layouts/Groups";
-import {
-  getSingleGroup,
-  updateGroup,
-  updateGroupitems,
-} from "../axios/group_action";
+import { addGroupitems } from "../axios/group_action";
 import { TextField, Button, Input, Box } from "@mui/material";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { getItems, getSingleItem, registerItem } from "../axios/items_action";
+import { registerItem } from "../axios/items_action";
 
 export default function ItemForm(props) {
   const [customFieldsnbr, setCustomFieldsNbr] = useState([]);
@@ -47,7 +41,20 @@ export default function ItemForm(props) {
       return next;
     });
   };
-
+  const onUpdateSubmit = async (values) => {
+    console.log(props.selectedItem);
+    console.log(values);
+    let customF = document.querySelectorAll("[data-key]");
+    let customFieldsArray = Array.from(customF).map((field) => {
+      let customObject = {
+        name: field.childNodes[0].firstChild.firstChild.value,
+        content: field.childNodes[1].firstChild.firstChild.value,
+        // MUI is a pain to get
+      };
+      return customObject;
+    });
+    console.log(customFieldsArray);
+  };
   const onSubmit = async (values) => {
     return new Promise((resolve) => {
       try {
@@ -66,7 +73,7 @@ export default function ItemForm(props) {
           customFields: customFieldsArray,
         };
         registerItem(newBody).then((res) => {
-          updateGroupitems({ item: res, groupId: props.currentGroup._id }).then(
+          addGroupitems({ item: res, groupId: props.currentGroup._id }).then(
             (response) => {
               props.setCurrentGroup(response);
             }
@@ -77,7 +84,11 @@ export default function ItemForm(props) {
     });
   };
 
-  return (
+  const handleChange = (e) => {
+    props.setFormDefValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  return !props.isUpdate ? (
     <form
       style={{
         display: "flex",
@@ -109,7 +120,7 @@ export default function ItemForm(props) {
         required
       ></Input>
       {customFieldsnbr.length > 0 && (
-        <Button onClick={delRow}>Retirer un objet</Button>
+        <Button onClick={delRow}>Retirer une valeur</Button>
       )}
       {customFieldsnbr.map((field, i) => {
         return (
@@ -141,6 +152,97 @@ export default function ItemForm(props) {
       })}
       <Button onClick={addRow}>Ajouter une valeur</Button>
       <Button type="submit">Créer un objet</Button>
+    </form>
+  ) : (
+    <form onSubmit={handleSubmit(onUpdateSubmit)}>
+      <TextField
+        name="name"
+        {...register("name")}
+        type="text"
+        variant="standard"
+        placeholder="Nom"
+        error={!!errors?.name}
+        helpertext={errors?.name ? errors.name.message : null}
+        required
+        value={props.formDefValues.name}
+        onChange={handleChange}
+      ></TextField>
+      <Input
+        name="quantity"
+        {...register("quantity")}
+        type="number"
+        variant="standard"
+        placeholder="Quantité"
+        error={!!errors?.quantity}
+        helpertext={errors?.quantity ? errors.quantity.message : null}
+        required
+        value={props.formDefValues.quantity}
+        onChange={handleChange}
+      ></Input>
+      {props.selectedItem.customFields.length > 0 &&
+        props.selectedItem.customFields.map((field, i) => {
+          return (
+            <Box key={`fieldBox${i}`} data-key={`fieldBox${i}`}>
+              <TextField
+                name={`content${i}`}
+                id={`content${i}`}
+                type="text"
+                variant="standard"
+                placeholder="Contenu"
+                error={!!errors?.content}
+                helpertext={errors?.content ? errors.content.message : null}
+                required
+                defaultValue={field.name}
+                key={`keyContent${i}`}
+              ></TextField>
+              <TextField
+                name={`value${i}`}
+                id={`value${i}`}
+                type="text"
+                variant="standard"
+                placeholder="Valeur"
+                error={!!errors?.value}
+                helpertext={errors?.value ? errors.value.message : null}
+                required
+                defaultValue={field.content}
+                key={`keyValue${i}`}
+              ></TextField>
+            </Box>
+          );
+        })}
+      {customFieldsnbr.length > 0 && (
+        <Button onClick={delRow}>Retirer une valeur</Button>
+      )}
+      {customFieldsnbr.map((field, i) => {
+        return (
+          <Box key={`key${i}`} data-key={`fieldBox${i}`}>
+            <TextField
+              name={`content${i}`}
+              id={`content${i}`}
+              type="text"
+              variant="standard"
+              placeholder="Contenu"
+              error={!!errors?.content}
+              helpertext={errors?.content ? errors.content.message : null}
+              required
+              key={`keyContent${i}`}
+            ></TextField>
+            <TextField
+              name={`value${i}`}
+              id={`value${i}`}
+              type="text"
+              variant="standard"
+              placeholder="Valeur"
+              error={!!errors?.value}
+              helpertext={errors?.value ? errors.value.message : null}
+              required
+              key={`keyValue${i}`}
+            ></TextField>
+          </Box>
+        );
+      })}
+      <Button onClick={addRow}>Ajouter une valeur</Button>
+      <Button type="submit">Send</Button>
     </form>
   );
 }

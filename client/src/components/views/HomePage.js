@@ -1,43 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 import BoxCenter from '../customComponents/BoxCenter'
 import Groups from '../Layouts/Groups'
 import {
-  getSingleGroup,
-  updateGroup,
-  updateGroupitems,
+  getSingleGroup
 } from '../axios/group_action'
-import { TextField, Button, Input, Box } from '@mui/material'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { getItems, getSingleItem, registerItem } from '../axios/items_action'
-import ItemForm from '../customComponents/ItemForm'
 import Items from '../Layouts/Items'
 
 export default function HomePage() {
   const [currentGroup, setCurrentGroup] = useState(null)
-  const [items, setItems] = useState([])
-
-  const validationSchema = yup
-    .object({
-      name: yup.string().required(),
-      quantity: yup.number().required(),
-      content: yup.string(),
-      value: yup.string(),
-    })
-    .required()
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      name: '',
-      quantity: 0,
-    },
-  })
-
 
   const chooseGroup = async (e) => {
     try {

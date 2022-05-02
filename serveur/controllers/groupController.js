@@ -45,7 +45,7 @@ const setGroup = async (req, res) => {
       password: hashedPassword,
       users: [user],
     })
-    user.groups = [...groups, group]
+    user.groups.push(group)
     user.save()
     res.status(200).json(group)
   } catch (err) {
@@ -73,7 +73,7 @@ const updateGroup = async (req, res) => {
   }
 }
 // @route PUT /api/group/updateGroupItems
-const updateGroupItems = async (req, res) => {
+const addGroupItems = async (req, res) => {
   
   const group = await Group.findById(req.body.groupId)
   if (!group) {
@@ -82,6 +82,38 @@ const updateGroupItems = async (req, res) => {
   }
   try {
     group.items.push(req.body.item)
+    group.save()
+    res.status(200).json(group)
+  } catch (err) {
+    console.error(err)
+  }
+}
+const updateGroupItem = async (req, res) => {
+  
+  const group = await Group.findById(req.body.groupId)
+  if (!group) {
+    res.status(400)
+    throw new Error('Group not found')
+  }
+  try {
+    group.items.push(req.body.item)
+    group.save()
+    res.status(200).json(group)
+  } catch (err) {
+    console.error(err)
+  }
+}
+// @route PUT /api/group/deleteGroupItem
+const deleteGroupItem = async (req, res) => {
+  
+  const group = await Group.findById(req.body.groupId)
+  if (!group) {
+    res.status(400)
+    throw new Error('Group not found')
+  }
+  try {
+    let index = group.items.indexOf(req.body.item)
+    group.items.splice(index,1)
     group.save()
     res.status(200).json(group)
   } catch (err) {
@@ -110,5 +142,7 @@ module.exports = {
   deleteGroup,
   getUserGroups,
   getSingleGroup,
-  updateGroupItems,
+  addGroupItems,
+  updateGroupItem,
+  deleteGroupItem
 }

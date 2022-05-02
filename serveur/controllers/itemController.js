@@ -33,13 +33,13 @@ const setItem = async (req, res) => {
 };
 // @route PUT /api/item/:id
 const updateItem = async (req, res) => {
-  const item = await Item.findById(req.params.id);
+  const item = await Item.findById(req.body.id);
   if (!item) {
     res.status(400);
     throw new Error("Item not found");
   }
   try {
-    const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
+    const updatedItem = await Item.findByIdAndUpdate(req.body.id, req.body, {
       new: true,
     });
     res.status(200).json(updatedItem);
@@ -47,15 +47,15 @@ const updateItem = async (req, res) => {
     console.log(err);
   }
 };
-// @route DELETE /api/item/:id
+// @route DELETE /api/item/deleteItem
 const deleteItem = async (req, res) => {
-  const item = await Item.findById(req.params.id);
+  const item = await Item.findById(req.body.id);
   if (!item) {
     res.status(400);
     throw new Error("Item not found");
   }
   try {
-    const deletedItem = await Item.findByIdAndDelete(req.params.id);
+    //const deletedItem = await Item.findByIdAndDelete(req.body.id);
     res.status(200).json({ message: `${item.name} was deleted` });
   } catch (err) {
     console.log(err);

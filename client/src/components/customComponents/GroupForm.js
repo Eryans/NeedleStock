@@ -1,13 +1,9 @@
-import { useState, useEffect, useContext } from 'react'
-import { getItems, registerItem } from '../axios/items_action'
-import { getUserGroup, setGroup } from '../axios/group_action'
-import BoxCenter from '../customComponents/BoxCenter'
-import { Button, Paper, TextField } from '@mui/material'
+
+import { Button, TextField } from '@mui/material'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 import { Box } from '@mui/system'
-import { AuthContext } from '../context/AuthContext'
 
 export default function GroupForm(props) {
   const validationSchema = yup

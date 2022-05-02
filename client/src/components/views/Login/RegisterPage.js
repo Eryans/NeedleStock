@@ -2,7 +2,7 @@ import Textfield from "@mui/material/TextField";
 import BoxCenter from "../../customComponents/BoxCenter";
 import { useForm } from "react-hook-form";
 import { Button, Link } from "@mui/material";
-import { Box, flexbox } from "@mui/system";
+import { Box} from "@mui/system";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerUser } from "../../axios/user_action";
