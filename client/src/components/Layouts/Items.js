@@ -8,10 +8,10 @@ export default function Items(props) {
   const [items, setItems] = useState([]);
   const [updateForm, setUpdateForm] = useState(false);
   const [selectedItem, setSelectedItem] = useState();
-  const [formDefValues,setFormDefValues] = useState();
+  const [formDefValues, setFormDefValues] = useState();
 
   const updateItem = (item) => {
-	setFormDefValues(item)
+    setFormDefValues(item);
     setSelectedItem(item);
     setUpdateForm(true);
   };
@@ -19,13 +19,17 @@ export default function Items(props) {
     try {
       deleteGroupItem({ groupId: props.currentGroup._id }).then((response) => {
         deleteItem({ id: itemId }).then((res) => {
-          console.log(res);
+         props.setCurrentGroup(response)
         });
       });
     } catch (error) {
       console.error(error);
     }
   };
+
+  const upgradeQuantity = (item) => {}
+  const lowerQuantity = (item) => {}
+  
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -40,6 +44,7 @@ export default function Items(props) {
     };
     fetchItems();
   }, [props.currentGroup]);
+
   return (
     <>
       <ul>
@@ -57,7 +62,7 @@ export default function Items(props) {
                   return (
                     <tr key={`${item._id}`}>
                       <td>{item.name}</td>
-                      <td>{item.quantity}</td>
+                      <td><Button onClick={() => lowerQuantity(item)}>-</Button>{item.quantity}<Button onClick={() => upgradeQuantity(item)}>+</Button></td>
                       <td>
                         <Button onClick={() => updateItem(item)}>
                           Modifier
@@ -79,9 +84,7 @@ export default function Items(props) {
               currentGroup={props.currentGroup}
               setCurrentGroup={props.setCurrentGroup}
               selectedItem={selectedItem}
-			  setSelectedItem={setSelectedItem}
-			  formDefValues={formDefValues}
-			  setFormDefValues={setFormDefValues}
+              setSelectedItem={setSelectedItem}
             ></ItemForm>
           )
         ) : (

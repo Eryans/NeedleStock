@@ -16,6 +16,7 @@ mongoose.connect(process.env.MONGODB_LINK);
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/group", require("./routes/groupsRoutes"));
 app.use("/api/item", require("./routes/itemsRoute"));
+app.use("/api/request",require("./routes/requestRoute"));
 
 app.use(errorHandler);
 

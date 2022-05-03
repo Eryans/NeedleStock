@@ -5,6 +5,7 @@ import {
   getSingleGroup
 } from '../axios/group_action'
 import Items from '../Layouts/Items'
+import Request from '../Layouts/Request'
 
 export default function HomePage() {
   const [currentGroup, setCurrentGroup] = useState(null)
@@ -28,6 +29,7 @@ export default function HomePage() {
           <>
             <h1>{currentGroup.name}</h1>
             <Items currentGroup={currentGroup} setCurrentGroup={setCurrentGroup}/>
+            <Request currentGroup={currentGroup} setCurrentGroup={setCurrentGroup}/>
           </>
         )}
       </BoxCenter>

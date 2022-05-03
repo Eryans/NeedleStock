@@ -26,3 +26,8 @@ export async function deleteItem(dataToSubmit) {
     })
     .then((response) => response.data);
 }
+export async function updateItem(dataToSubmit) {
+  return await axios
+    .put(`${$ITEMS_SERVER}/updateItem`, dataToSubmit, Auth)
+    .then((response) => response.data);
+}

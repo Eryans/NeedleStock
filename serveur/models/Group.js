@@ -19,6 +19,13 @@ const groupSchema = new mongoose.Schema({
       ref: "item",
     },
   ],
+  requests: [
+    {
+      type: mongoose.Types.ObjectId,
+      required:false,
+      ref:"request"
+    }
+  ],
   password: {
     type: String,
     required: true,

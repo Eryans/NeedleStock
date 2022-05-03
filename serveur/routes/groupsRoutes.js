@@ -9,7 +9,6 @@ const {
   getSingleGroup,
   addGroupItems,
   deleteGroupItem,
-  updateGroupItem,
 } = require("../controllers/groupController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -21,7 +20,6 @@ router
   .route("/updateGroup")
   .put(protect, updateGroup)
   .delete(protect, deleteGroup);
-router.route("/updateGroupItems").put(protect, updateGroupItem);
 router.route("/addGroupItems").put(protect, addGroupItems);
 router.route("/deleteGroupItem").put(protect, deleteGroupItem);
 

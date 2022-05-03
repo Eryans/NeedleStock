@@ -11,7 +11,7 @@ const { protect } = require("../middleware/authMiddleware");
 
 router.route("/").get(protect, getItems).post(protect, setItem);
 router.route("/setItem").post(protect, setItem);
-router.route("/:id").put(protect, updateItem);
+router.route("/updateItem").put(protect, updateItem);
 router.route("/getSingleItem").post(protect, getSingleItem);
 router.route("/deleteItem").delete(protect, deleteItem);
 

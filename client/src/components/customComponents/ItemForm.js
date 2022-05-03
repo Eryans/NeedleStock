@@ -4,7 +4,7 @@ import { addGroupitems } from "../axios/group_action";
 import { TextField, Button, Input, Box } from "@mui/material";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { registerItem } from "../axios/items_action";
+import { registerItem,updateItem } from "../axios/items_action";
 
 export default function ItemForm(props) {
   const [customFieldsnbr, setCustomFieldsNbr] = useState([]);
@@ -23,10 +23,6 @@ export default function ItemForm(props) {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    defaultValues: {
-      name: "",
-      quantity: 0,
-    },
   });
 
   const addRow = () => {
@@ -43,17 +39,30 @@ export default function ItemForm(props) {
   };
   const onUpdateSubmit = async (values) => {
     console.log(props.selectedItem);
-    console.log(values);
     let customF = document.querySelectorAll("[data-key]");
     let customFieldsArray = Array.from(customF).map((field) => {
       let customObject = {
         name: field.childNodes[0].firstChild.firstChild.value,
         content: field.childNodes[1].firstChild.firstChild.value,
-        // MUI is a pain to get
+        // MUI makes it a pain to get data
       };
       return customObject;
     });
+    
+    const newBody = {
+      id:props.selectedItem._id,
+      name: values.name,
+      quantity: values.quantity,
+      customFields: customFieldsArray,
+    };
     console.log(customFieldsArray);
+    updateItem(newBody).then((res)=>{
+      try {
+        console.log(res)
+      } catch (error) {
+        console.error(error)
+      }
+    })
   };
   const onSubmit = async (values) => {
     return new Promise((resolve) => {
@@ -85,7 +94,10 @@ export default function ItemForm(props) {
   };
 
   const handleChange = (e) => {
-    props.setFormDefValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    props.setSelectedItem((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   return !props.isUpdate ? (
@@ -164,7 +176,7 @@ export default function ItemForm(props) {
         error={!!errors?.name}
         helpertext={errors?.name ? errors.name.message : null}
         required
-        value={props.formDefValues.name}
+        value={props.selectedItem.name}
         onChange={handleChange}
       ></TextField>
       <Input
@@ -176,7 +188,7 @@ export default function ItemForm(props) {
         error={!!errors?.quantity}
         helpertext={errors?.quantity ? errors.quantity.message : null}
         required
-        value={props.formDefValues.quantity}
+        value={props.selectedItem.quantity}
         onChange={handleChange}
       ></Input>
       {props.selectedItem.customFields.length > 0 &&
