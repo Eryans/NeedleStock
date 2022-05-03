@@ -1,19 +1,18 @@
-import { Button, Box, Select, MenuItem, Input } from "@mui/material";
+import { TextField, Button, Box, Select, MenuItem, Input } from "@mui/material";
 import { getThemeProps } from "@mui/system";
 import { useEffect, useState } from "react";
-import { getSingleGroup } from "../axios/group_action";
-import { getSingleItem } from "../axios/items_action";
+import { addGroupRequest, getSingleGroup } from "../axios/group_action";
+import { getSingleItem, updateItemQuantity } from "../axios/items_action";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import ItemSelector from "../customComponents/ItemSelector";
+import { registerRequest, getGroupRequests } from "../axios/request_action";
 
 export default function Request(props) {
   const validationSchema = yup
     .object({
       name: yup.string().required(),
-      quantity: yup.number().required(),
-      content: yup.string(),
-      value: yup.string(),
     })
     .required();
   const {
@@ -26,12 +25,48 @@ export default function Request(props) {
 
   const [requestForm, setRequestForm] = useState(false);
   const [items, setItems] = useState(props.currentGroup.items);
-  const [selectorValue, setSelectorValue] = useState("");
   const [selectorNumber, setSelectorNumber] = useState([]);
-
-  const handleChange = (e) => {
-    setSelectorValue(e.target.value);
+  const [requests, setRequests] = useState([]);
+  const onSubmit = (values) => {
+    return new Promise((resolve) => {
+      try {
+        let input = document.querySelectorAll("[data-selector-key]");
+        let selectorValues = Array.from(input).map((item) => {
+          let customObject = {
+            item: item.childNodes[0].childNodes[1].defaultValue,
+            quantityToChange: item.childNodes[1].firstChild.value,
+            // MUI is REALLY a pain to get data
+          };
+          return customObject;
+        });
+        let Request = {
+          name: values.name,
+          actions: selectorValues,
+          group: props.currentGroup._id,
+        };
+        console.log(Request);
+        registerRequest(Request).then((res) => {
+          addGroupRequest({ group: props.currentGroup, request: res }).then(
+            (response) => {
+              console.log(response);
+            }
+          );
+          console.log(res);
+          resolve();
+        });
+      } catch (error) {}
+    });
   };
+
+  const executeRequest = (request) =>{
+    request.actions.forEach(action => {
+      console.log(action)
+      updateItemQuantity({item:action.item,quantity:action.quantityToChange}).then(res => {
+        console.log(res)
+      })
+    })
+  }
+
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -44,6 +79,12 @@ export default function Request(props) {
         });
       } catch (err) {}
     };
+    const fetchRequest = async () => {
+      getGroupRequests({ groupId: props.currentGroup._id }).then((res) => {
+        setRequests(res);
+      });
+    };
+    fetchRequest();
     fetchItems();
   }, [props.currentGroup]);
 
@@ -53,46 +94,50 @@ export default function Request(props) {
         variant="contained"
         onClick={() => {
           setRequestForm(true);
-          let newField = {};
-          setSelectorNumber([...selectorNumber, newField]);
         }}
       >
         Créer une nouvelle Requête
       </Button>
       {requestForm ? (
-        <form>
-          {selectorNumber.map(() => {
-            return <>
-              <Select
-                id="item-Selector"
-                labelId="itemSelector"
-                label="Selectionner un objet"
-                value={selectorValue}
-                onChange={handleChange}
-              >
-                {items.map((item, i) => {
-                  return (
-                    <MenuItem key={`${item}/${i}`} value={item._id}>
-                      {item.name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-              <Input
-                name="quantity"
-                {...register("quantity")}
-                type="number"
-                variant="standard"
-                placeholder="Quantité"
-                error={!!errors?.quantity}
-                helpertext={errors?.quantity ? errors.quantity.message : null}
-                required
-              ></Input>
-            </>;
-          })}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            name="name"
+            {...register("name")}
+            type="text"
+            variant="standard"
+            placeholder="Nom"
+            error={!!errors?.name}
+            helpertext={errors?.name ? errors.name.message : null}
+            required
+          ></TextField>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <ItemSelector items={items} />
+            {selectorNumber.length > 0 &&
+              selectorNumber.map((x, i) => {
+                return <ItemSelector items={items} key={`Selector${i}`} />;
+              })}
+          </Box>
+          <Button
+            onClick={() => {
+              let newField = {};
+              setSelectorNumber([...selectorNumber, newField]);
+            }}
+          >
+            rajouter une entrée
+          </Button>
+          <Button type="submit">Envoyer</Button>
         </form>
       ) : (
         <></>
+      )}
+      {requestForm ? (
+        <></>
+      ) : (
+        <Box sx={{display:"flex",flexDirection:"column",gap:"1em"}} mt={4}>
+          {requests.map((request) => {
+            return <Button variant="contained" onClick={() => executeRequest(request)}>{request.name}</Button>;
+          })}
+        </Box>
       )}
     </Box>
   );

@@ -36,3 +36,8 @@ export async function deleteGroupItem(dataToSubmit) {
     .put(`${$GROUP_SERVER}/deleteGroupItem`, dataToSubmit, Auth)
     .then((response) => response.data)
 }
+export async function addGroupRequest(dataToSubmit) {
+  return await axios
+    .put(`${$GROUP_SERVER}/addGroupRequest`, dataToSubmit, Auth)
+    .then((response) => response.data)
+}

@@ -1,13 +1,13 @@
 import axios from "axios";
-import { $REQUEST_SERVER, Auth } from "../config";
+import { $REQUESTS_SERVER, Auth } from "../config";
 
-export async function registerItem(dataToSubmit) {
+export async function registerRequest(dataToSubmit) {
   return await axios
-    .post(`${$REQUEST_SERVER}/setRequest`, dataToSubmit, Auth)
+    .post(`${$REQUESTS_SERVER}/setRequest`, dataToSubmit, Auth)
     .then((response) => response.data);
 }
-export async function getGroupRequests() {
+export async function getGroupRequests(dataToSubmit) {
   return await axios
-    .get(`${$REQUEST_SERVER}/getRequest`, Auth)
+    .post(`${$REQUESTS_SERVER}/getGroupRequests`, dataToSubmit,Auth)
     .then((response) => response.data);
 }

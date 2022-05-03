@@ -88,6 +88,21 @@ const addGroupItems = async (req, res) => {
     console.error(err);
   }
 };
+// @route PUT /api/group/addGroupRequest
+const addGroupRequest = async (req, res) => {
+  const group = await Group.findById(req.body.group._id);
+  if (!group) {
+    res.status(400);
+    throw new Error("Group not found");
+  }
+  try {
+    group.requests.push(req.body.request);
+    group.save();
+    res.status(200).json(group);
+  } catch (err) {
+    console.error(err);
+  }
+};
 // @route PUT /api/group/deleteGroupItem
 const deleteGroupItem = async (req, res) => {
   const group = await Group.findById(req.body.groupId);
@@ -128,4 +143,5 @@ module.exports = {
   getSingleGroup,
   addGroupItems,
   deleteGroupItem,
+  addGroupRequest
 };

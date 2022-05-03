@@ -31,3 +31,8 @@ export async function updateItem(dataToSubmit) {
     .put(`${$ITEMS_SERVER}/updateItem`, dataToSubmit, Auth)
     .then((response) => response.data);
 }
+export async function updateItemQuantity(dataToSubmit) {
+  return await axios
+    .put(`${$ITEMS_SERVER}/updateItemQuantity`, dataToSubmit, Auth)
+    .then((response) => response.data);
+}

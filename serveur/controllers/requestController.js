@@ -4,26 +4,17 @@ const Request = require("../models/Request");
 // @route GET /api/request
 const getGroupRequests = async (req, res) => {
   try {
-    const requests = await Request.find();
-    res.status(200).json(requests);
-  } catch (err) {
-    console.log(err);
-  }
-};
-const getRequests = async (req, res) => {
-  try {
-    const request = await Request.findOne({_id: req.body._id});
+    const request = await Request.find({group:req.body.groupId});
     res.status(200).json(request);
   } catch (err) {
     console.log(err);
   }
 };
+
 // @route POST /api/request/setRequest
 const setRequest = async (req, res) => {
   try {
-    const request = await Request.create({
-      //TODO
-    });
+    const request = await Request.create(req.body);
     res.status(200).json(request);
   } catch (err) {
     console.log(err);
@@ -65,5 +56,4 @@ module.exports = {
   setRequest,
   updateRequest,
   deleteRequest,
-  getRequests
 };

@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
 
 const actionSchema = new mongoose.Schema({
-  items: [
+  item: 
     {
       type: mongoose.Types.ObjectId,
       required: false,
       ref: "item",
     },
-  ],
   quantityToChange: 
     {
       type: Number,
@@ -20,7 +19,12 @@ const requestSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  actions: [actionSchema]
+  actions: [actionSchema],
+  group:{
+    type: mongoose.Types.ObjectId,
+    required:true,
+    ref:"group"
+  }
 });
 
 const requestModel = mongoose.model("request", requestSchema);
