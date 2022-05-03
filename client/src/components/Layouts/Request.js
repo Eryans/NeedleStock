@@ -27,6 +27,7 @@ export default function Request(props) {
   const [items, setItems] = useState(props.currentGroup.items);
   const [selectorNumber, setSelectorNumber] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [message, setMessage] = useState("")
   const onSubmit = (values) => {
     return new Promise((resolve) => {
       try {
@@ -61,8 +62,9 @@ export default function Request(props) {
   const executeRequest = (request) =>{
     request.actions.forEach(action => {
       console.log(action)
-      updateItemQuantity({item:action.item,quantity:action.quantityToChange}).then(res => {
+      updateItemQuantity({item:action.item,quantity:action.quantityToChange,requestObj:request}).then(res => {
         console.log(res)
+        setMessage(res.message)
       })
     })
   }
@@ -86,10 +88,12 @@ export default function Request(props) {
     };
     fetchRequest();
     fetchItems();
-  }, [props.currentGroup]);
+  }, [props.currentGroup,message]);
 
   return (
     <Box mt={5}>
+      {message &&
+      <h3>{message}</h3>}
       <Button
         variant="contained"
         onClick={() => {

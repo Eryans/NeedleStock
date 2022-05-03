@@ -1,3 +1,4 @@
+const { response } = require("express");
 const Item = require("../models/Items");
 
 // @desc Get Items
@@ -48,14 +49,17 @@ const updateItem = async (req, res) => {
   }
 };
 const updateItemQuantity = async (req, res) => {
+
   const item = await Item.findById(req.body.item);
   if (!item) {
     res.status(400);
     throw new Error("Item not found");
   }
+  if (item.quantity < req.body.quantity) {
+    return res.json({message: "Requête impossible à effectuer, pas assez d'éléments restants"})
+  }
   try {
     let newValue = item.quantity - req.body.quantity
-    console.log(newValue)
     const updatedItem = await Item.findByIdAndUpdate(req.body.item, {
       $set:{
         quantity: newValue
