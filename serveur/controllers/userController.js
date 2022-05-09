@@ -70,11 +70,12 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email: email });
     if (user && bcrypt.compare(password, user.password)) {
+      let token = await generateToken(user._id);
       return res.json({
         _id: user.id,
         name: user.name,
         email: user.email,
-        token: generateToken(user._id),
+        token: token,
         message: "Utilisateur connecté",
         groups: user.groups,
         success: true,

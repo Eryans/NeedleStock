@@ -4,7 +4,7 @@ import { addGroupitems } from "../axios/group_action";
 import { TextField, Button, Input, Box } from "@mui/material";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { registerItem,updateItem } from "../axios/items_action";
+import { registerItem, updateItem } from "../axios/items_action";
 
 export default function ItemForm(props) {
   const [customFieldsnbr, setCustomFieldsNbr] = useState([]);
@@ -13,6 +13,7 @@ export default function ItemForm(props) {
     .object({
       name: yup.string().required(),
       quantity: yup.number().required(),
+      minimumAlert: yup.number().required(),
       content: yup.string(),
       value: yup.string(),
     })
@@ -38,7 +39,6 @@ export default function ItemForm(props) {
     });
   };
   const onUpdateSubmit = async (values) => {
-    console.log(props.selectedItem);
     let customF = document.querySelectorAll("[data-key]");
     let customFieldsArray = Array.from(customF).map((field) => {
       let customObject = {
@@ -48,21 +48,21 @@ export default function ItemForm(props) {
       };
       return customObject;
     });
-    
+
     const newBody = {
-      id:props.selectedItem._id,
+      id: props.selectedItem._id,
       name: values.name,
       quantity: values.quantity,
+      minimumAlert: values.minimumAlert,
       customFields: customFieldsArray,
     };
-    console.log(customFieldsArray);
-    updateItem(newBody).then((res)=>{
+    updateItem(newBody).then((res) => {
       try {
-        console.log(res)
+        console.log(res);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
-    })
+    });
   };
   const onSubmit = async (values) => {
     return new Promise((resolve) => {
@@ -79,6 +79,7 @@ export default function ItemForm(props) {
         const newBody = {
           name: values.name,
           quantity: values.quantity,
+          minimumAlert: values.minimumAlert,
           customFields: customFieldsArray,
         };
         registerItem(newBody).then((res) => {
@@ -129,6 +130,19 @@ export default function ItemForm(props) {
         placeholder="Quantité"
         error={!!errors?.quantity}
         helpertext={errors?.quantity ? errors.quantity.message : null}
+        required
+      ></Input>
+      {customFieldsnbr.length > 0 && (
+        <Button onClick={delRow}>Retirer une valeur</Button>
+      )}
+      <Input
+        name="min-quantity"
+        {...register("minimumAlert")}
+        type="number"
+        variant="standard"
+        placeholder="Quantité minimum d'alerte"
+        error={!!errors?.minimumAlert}
+        helpertext={errors?.Quantity ? errors.minimumAlert.message : null}
         required
       ></Input>
       {customFieldsnbr.length > 0 && (
@@ -190,6 +204,18 @@ export default function ItemForm(props) {
         required
         value={props.selectedItem.quantity}
         onChange={handleChange}
+      ></Input>
+      <Input
+        name="min-quantity"
+        {...register("minimumAlert")}
+        type="number"
+        variant="standard"
+        placeholder="Quantité minimum d'alerte"
+        error={!!errors?.minimumAlert}
+        helpertext={errors?.minimumAlert ? errors.minimumAlert.message : null}
+        value={props.selectedItem.minimumAlert}
+        onChange={handleChange}
+        required
       ></Input>
       {props.selectedItem.customFields.length > 0 &&
         props.selectedItem.customFields.map((field, i) => {

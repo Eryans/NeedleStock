@@ -4,8 +4,8 @@ const customFieldsSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    min: [0, "Le nom doit être en 0 et 255 charactères"],
-    max: [255, "Le nom doit être en 0 et 255 charactères"],
+    min: [1, "Le nom doit être en 1 et 75 caractères"],
+    max: [75, "Le nom doit être en 1 et 75 caractères"],
   },
   content: {
     type: mongoose.Schema.Types.Mixed,
@@ -18,6 +18,8 @@ const itemSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      min: [1, "Le nom doit être en 1 et 75 caractères"],
+      max: [75, "Le nom doit être en 1 et 75 caractères"],
     },
     quantity: {
       type: Number,
@@ -30,6 +32,13 @@ const itemSchema = new mongoose.Schema(
       min:[0,"La quantité minimum ne peut pas être en dessous de zéro"]
     },
     customFields: [customFieldsSchema],
+    groups: [
+      {
+        type: mongoose.Types.ObjectId,
+        required: false,
+        ref: "group",
+      },
+    ]
   },
   {
     timestamps: true,

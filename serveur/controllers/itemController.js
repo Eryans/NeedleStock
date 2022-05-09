@@ -1,6 +1,16 @@
 const { response } = require("express");
 const Item = require("../models/Items");
 
+//@ POST /api/item//getSingleItem
+const getSingleItem = async (req, res) => {
+  try {
+    const item = await Item.findOne({ _id: req.body._id });
+    res.status(200).json(item);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 // @desc Get Items
 // @route GET /api/item
 const getItems = async (req, res) => {
@@ -8,28 +18,22 @@ const getItems = async (req, res) => {
     const items = await Item.find();
     res.status(200).json(items);
   } catch (err) {
-    console.log(err);
-  }
-};
-const getSingleItem = async (req, res) => {
-  try {
-    const item = await Item.findOne({ _id: req.body._id });
-    res.status(200).json(item);
-  } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 // @route POST /api/item/setItem
 const setItem = async (req, res) => {
   try {
+    console.log(req.body)
     const item = await Item.create({
       name: req.body.name,
+      minimumAlert: req.body.minQuantity,
       customFields: req.body.customFields,
       quantity: req.body.quantity,
     });
     res.status(200).json(item);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 // @route PUT /api/item/:id
@@ -45,7 +49,7 @@ const updateItem = async (req, res) => {
     });
     res.status(200).json(updatedItem);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 const updateItemQuantity = async (req, res) => {
@@ -84,7 +88,7 @@ const deleteItem = async (req, res) => {
     //const deletedItem = await Item.findByIdAndDelete(req.body.id);
     res.status(200).json({ message: `${item.name} was deleted` });
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 

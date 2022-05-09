@@ -138,8 +138,8 @@ export default function Request(props) {
         <></>
       ) : (
         <Box sx={{display:"flex",flexDirection:"column",gap:"1em"}} mt={4}>
-          {requests.map((request) => {
-            return <Button variant="contained" onClick={() => executeRequest(request)}>{request.name}</Button>;
+          {requests.map((request,i) => {
+            return <Button variant="contained" key={`${request}/${i}`} onClick={() => executeRequest(request)}>{request.name}</Button>;
           })}
         </Box>
       )}

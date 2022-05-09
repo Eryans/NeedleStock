@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Alert, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { getSingleGroup, deleteGroupItem } from "../axios/group_action";
 import { getSingleItem, deleteItem } from "../axios/items_action";
@@ -19,7 +19,7 @@ export default function Items(props) {
     try {
       deleteGroupItem({ groupId: props.currentGroup._id }).then((response) => {
         deleteItem({ id: itemId }).then((res) => {
-         props.setCurrentGroup(response)
+          props.setCurrentGroup(response);
         });
       });
     } catch (error) {
@@ -27,9 +27,9 @@ export default function Items(props) {
     }
   };
 
-  const upgradeQuantity = (item) => {}
-  const lowerQuantity = (item) => {}
-  
+  const upgradeQuantity = (item) => {};
+  const lowerQuantity = (item) => {};
+
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -47,6 +47,18 @@ export default function Items(props) {
 
   return (
     <>
+      {items.length > 0 && (
+        <>
+          {items.map((item) => {
+            if (item.minimumAlert > item.quantity) {
+              return (
+                <Alert severity="error">{`Attention, il ne reste que ${item.quantity} unités de ${item.name} !`}</Alert>
+              );
+            }
+            return <></>
+          })}
+        </>
+      )}
       <ul>
         {items.length > 0 ? (
           !updateForm ? (
@@ -62,7 +74,11 @@ export default function Items(props) {
                   return (
                     <tr key={`${item._id}`}>
                       <td>{item.name}</td>
-                      <td><Button onClick={() => lowerQuantity(item)}>-</Button>{item.quantity}<Button onClick={() => upgradeQuantity(item)}>+</Button></td>
+                      <td>
+                        <Button onClick={() => lowerQuantity(item)}>-</Button>
+                        {item.quantity}
+                        <Button onClick={() => upgradeQuantity(item)}>+</Button>
+                      </td>
                       <td>
                         <Button onClick={() => updateItem(item)}>
                           Modifier

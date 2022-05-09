@@ -19,13 +19,11 @@ const protect = async (req, res, next) => {
       next();
     } catch (err) {
       console.log(err);
-      res.status(401);
-      throw new Error("ACCES DENIED");
+      res.status(400).json({message: "ACCÈS REFUSÉ"});
     }
   }
   if (!token) {
-    res.status(401);
-    throw new Error("NOT AUTHORIZED");
+    res.status(401).json({message: "PAS AUTHORISÉ"});
   }
 };
 module.exports = {protect}

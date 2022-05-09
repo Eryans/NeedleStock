@@ -1,23 +1,25 @@
-import Textfield from '@mui/material/TextField'
-import BoxCenter from '../../customComponents/BoxCenter'
-import { useForm } from 'react-hook-form'
-import { Button, Link } from '@mui/material'
-import { loginUser } from '../../axios/user_action'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { useNavigate } from 'react-router-dom'
-import { useContext, useEffect} from 'react'
-import {AuthContext} from '../../context/AuthContext'
+import Textfield from "@mui/material/TextField";
+import BoxCenter from "../../customComponents/BoxCenter";
+import { useForm } from "react-hook-form";
+import { Alert, Button, Link } from "@mui/material";
+import { loginUser } from "../../axios/user_action";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function LoginPage() {
-  const { user, setUser } = useContext(AuthContext)
-  const navigator = useNavigate()
+  const { user, setUser } = useContext(AuthContext);
+  const navigator = useNavigate();
+  const {state} = useLocation();
+  const {notAuth} = state;
   const validationSchema = yup
     .object({
       email: yup.string().email().required(),
       password: yup.string().required(),
     })
-    .required()
+    .required();
   const {
     register,
     handleSubmit,
@@ -25,13 +27,13 @@ export default function LoginPage() {
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
-  })
+  });
   useEffect(() => {
-    (user && user.isLogged) && navigator('/')
-  }, [])
+    user && user.isLogged && navigator("/");
+  }, [user]);
   const onSubmit = (values) => {
     return new Promise((resolve) => {
       try {
@@ -43,27 +45,27 @@ export default function LoginPage() {
             token: res.token,
             groups: res.groups,
             isLogged: true,
-          }
-          setUser(userInfo)
-          localStorage['user'] = JSON.stringify(userInfo)
-          navigator('/')
-          resolve()
-        })
+          };
+          setUser(userInfo);
+          localStorage["user"] = JSON.stringify(userInfo);
+          resolve();
+        });
       } catch (err) {
-        console.error(err)
+        console.error(err);
       }
-    })
-  }
+    });
+  };
 
   return (
     <BoxCenter>
+      {notAuth && <Alert severity="error">{notAuth}</Alert>}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        style={{ display: 'flex', flexDirection: 'column', gap: '2em' }}
+        style={{ display: "flex", flexDirection: "column", gap: "2em" }}
       >
         <Textfield
           name="email"
-          {...register('email')}
+          {...register("email")}
           type="email"
           variant="standard"
           placeholder="email"
@@ -73,7 +75,7 @@ export default function LoginPage() {
         ></Textfield>
         <Textfield
           name="password"
-          {...register('password')}
+          {...register("password")}
           type="password"
           variant="standard"
           placeholder="password"
@@ -87,5 +89,5 @@ export default function LoginPage() {
         </Link>
       </form>
     </BoxCenter>
-  )
+  );
 }
